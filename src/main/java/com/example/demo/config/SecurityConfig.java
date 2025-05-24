@@ -34,22 +34,18 @@ public class SecurityConfig {
                 .httpBasic().disable();
         return http.build();
     }
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000", "https://your-frontend-domain.com"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true); // 인증 정보 포함 여부
+        config.addAllowedOriginPattern("*"); // 모든 origin 허용
+        config.addAllowedMethod("*");        // GET, POST, PUT, DELETE 등 모두 허용
+        config.addAllowedHeader("*");        // 모든 header 허용
+        config.setAllowCredentials(true);    // 인증 정보 포함 가능
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-
         return source;
     }
-
-
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
