@@ -7,32 +7,17 @@ import com.example.demo.enums.UserRole;
 import com.example.demo.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class loginService {
 
     private final UserRepository userRepository;
-
-    // 로그인 - 이메일로 사용자 조회 후 DTO 반환
-    public UserDto login(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
-        return UserDto.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .name(user.getName())
-                .role(user.getRole())
-                .createdAt(user.getCreatedAt())
-                .lastUpdatedAt(user.getLastUpdatedAt())
-                .build();
-    }
-
     @Transactional
     public UserDto signup(String email, String name, String role, String password, String stdNum, String depart) {
 
@@ -62,4 +47,34 @@ public class loginService {
                 .lastUpdatedAt(savedUser.getLastUpdatedAt())
                 .build();
     }
+
+    public boolean login(String email, String rawPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        log.debug("입력된 비밀번호: {}", rawPassword);
+        log.debug("저장된 비밀번호: {}", user.getPassword());
+
+        boolean matches = rawPassword.equals(user.getPassword());
+        log.debug("비밀번호 T/F : {}", matches);
+
+        return matches;
+    }
+
+    public UserDto getUserDtoByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        return UserDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .role(user.getRole())
+                .studentNumber(user.getStudentNumber())
+                .department(user.getDepartment())
+                .createdAt(user.getCreatedAt())
+                .lastUpdatedAt(user.getLastUpdatedAt())
+                .build();
+    }
 }
+
