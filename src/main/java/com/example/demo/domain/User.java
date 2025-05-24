@@ -3,7 +3,6 @@ package com.example.demo.domain;
 import com.example.demo.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,28 +18,26 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 255)
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false)
     private String name;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
 
-    @Column(nullable = false)
-    private String password;
-
-    @Column(name = "created_at", nullable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "last_updated_at", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime lastUpdatedAt;
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = this.lastUpdatedAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now();
+        this.lastUpdatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
