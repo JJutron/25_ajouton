@@ -6,7 +6,9 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "cart_item")
+@Table(name = "cart_item", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"cart_id", "menu_id"})
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,18 +20,18 @@ public class CartItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 장바구니 참조
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id", nullable = false)
     private Cart cart;
 
-    // 메뉴 참조
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_id", nullable = false)
     private Menu menu;
 
+    @Column(nullable = false)
     private int amount;
 
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist

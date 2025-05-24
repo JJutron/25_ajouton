@@ -1,8 +1,10 @@
 package com.example.demo.service;
 
 import com.example.demo.domain.Cart;
+import com.example.demo.domain.CartItem;
 import com.example.demo.domain.User;
 import com.example.demo.dto.CartDto;
+import com.example.demo.repository.CartItemRepository;
 import com.example.demo.repository.CartRepository;
 import com.example.demo.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -18,6 +20,7 @@ public class CartService {
 
     private final UserRepository userRepository;
     private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
 
     @Transactional
     public CartDto createCartForUser(Long userId) {
@@ -72,5 +75,11 @@ public class CartService {
             throw new IllegalArgumentException("해당 장바구니가 존재하지 않습니다.");
         }
         cartRepository.deleteById(cartId);
+    }
+
+    public void deleteCartItem(Long cartId, Long menuId) {
+        CartItem cartItem = cartItemRepository.findByCartIdAndMenuId(cartId, menuId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 장바구니 항목이 존재하지 않습니다."));
+        cartItemRepository.delete(cartItem);
     }
 }

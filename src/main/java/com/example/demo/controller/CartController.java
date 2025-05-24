@@ -33,4 +33,11 @@ public class CartController {
         cartService.deleteCart(cartId);
         return ResponseEntity.ok("장바구니가 삭제되었습니다.");
     }
+
+    @DeleteMapping("/{cartId}/item/{menuId}")
+    public ResponseEntity<String> deleteCartItem(@PathVariable Long cartId,
+                                                 @PathVariable Long menuId) {
+        cartService.deleteCartItem(cartId, menuId);
+        return ResponseEntity.ok("해당 항목이 장바구니에서 삭제되었습니다.");
+    }
 }
