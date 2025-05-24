@@ -15,8 +15,8 @@ services:
       - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
     networks:
-      - goodjob-net
+      - ajouton-net
 
 networks:
-  goodjob-net:
-    driver: bridge
+  ajouton-net:
+    external: true
