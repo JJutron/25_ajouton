@@ -76,4 +76,20 @@ public class StoreService {
 
         menuRepository.delete(menu);
     }
+
+    public List<MenuDto> getMenusByStoreId(Long storeId) {
+        List<Menu> menus = menuRepository.findByStoreId(storeId);
+
+        return menus.stream()
+                .map(menu -> MenuDto.builder()
+                        .id(menu.getId())
+                        .menuName(menu.getMenuName())
+                        .price(menu.getPrice())
+                        .amount(menu.getAmount())
+                        .description(menu.getDescription())
+                        .createdAt(menu.getCreatedAt())
+                        .lastUpdatedAt(menu.getLastUpdatedAt())
+                        .build())
+                .collect(Collectors.toList());
+    }
 }

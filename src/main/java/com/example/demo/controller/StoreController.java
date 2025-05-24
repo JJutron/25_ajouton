@@ -47,4 +47,10 @@ public class StoreController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/{storeId}/menus")
+    public ResponseEntity<List<MenuDto>> getMenusByStoreId(@PathVariable Long storeId) {
+        List<MenuDto> menus = storeService.getMenusByStoreId(storeId);
+        return ResponseEntity.ok(menus);
+    }
+
 }
