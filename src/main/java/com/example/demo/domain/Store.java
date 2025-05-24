@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import jakarta.persistence.Id;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "store")
 @Getter
@@ -22,4 +25,7 @@ public class Store {
 
     @Column(name = "store_location", nullable = false, length = 500)
     private String storeLocation;
+
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Menu> menus = new ArrayList<>();
 }
