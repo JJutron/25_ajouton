@@ -4,11 +4,14 @@ import com.example.demo.domain.User;
 import com.example.demo.domain.UserOrder;
 import com.example.demo.dto.OrderDto;
 import com.example.demo.dto.OrderResponseDto;
+import com.example.demo.dto.StoreOrderDto;
 import com.example.demo.enums.OrderStatus;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +24,6 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
-
-
 
     @PostMapping("/create")
 
@@ -56,5 +57,17 @@ public class OrderController {
     public ResponseEntity<List<OrderResponseDto>> getUserOrdersWithDetails(@RequestParam Long userId) {
         List<OrderResponseDto> orders = orderService.getUserOrdersWithDetails(userId);
         return ResponseEntity.ok(orders);
+    }
+
+    @Operation(summary = "가게별 오더", description = "userId와 storeId를 기반으로 주문 목록 반환")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 조회됨"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청")
+    })
+    @GetMapping("/store_order")
+    public ResponseEntity<List<StoreOrderDto>> getOrdersByStoreId(
+            @RequestParam Long storeId
+    ) {
+        return ResponseEntity.ok(orderService.getOrdersByStoreId(storeId));
     }
 }

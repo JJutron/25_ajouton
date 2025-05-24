@@ -6,6 +6,7 @@ import com.example.demo.domain.User;
 import com.example.demo.domain.UserOrder;
 import com.example.demo.dto.OrderDto;
 import com.example.demo.dto.OrderResponseDto;
+import com.example.demo.dto.StoreOrderDto;
 import com.example.demo.enums.OrderStatus;
 import com.example.demo.enums.UserRole;
 import com.example.demo.repository.MenuRepository;
@@ -129,6 +130,27 @@ public class OrderService {
                     .menuName(menuName)
                     .price(order.getPrice())
                     .status(order.getStatus().name()) // Enum -> String
+                    .createdAt(order.getCreatedAt())
+                    .build();
+        }).collect(Collectors.toList());
+    }
+
+    public List<StoreOrderDto> getOrdersByStoreId(Long storeId) {
+        List<UserOrder> orders = orderRepository.findByStoreId(storeId);
+
+        return orders.stream().map(order -> {
+            String menuName = menuRepository
+                    .findFirstByStoreIdAndPrice(order.getStore().getId(), order.getPrice())
+                    .map(Menu::getMenuName)
+                    .orElse("알 수 없음");
+
+            return StoreOrderDto.builder()
+                    .orderId(order.getId())
+                    .userId(order.getUser().getId())
+                    .userName(order.getUser().getName()) // 필요시
+                    .menuName(menuName)
+                    .price(order.getPrice())
+                    .status(order.getStatus())
                     .createdAt(order.getCreatedAt())
                     .build();
         }).collect(Collectors.toList());
