@@ -3,10 +3,14 @@ package com.example.demo.service;
 
 import com.example.demo.domain.User;
 import com.example.demo.dto.UserDto;
+import com.example.demo.enums.UserRole;
 import com.example.demo.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +30,36 @@ public class loginService {
                 .role(user.getRole())
                 .createdAt(user.getCreatedAt())
                 .lastUpdatedAt(user.getLastUpdatedAt())
+                .build();
+    }
+
+    @Transactional
+    public UserDto signup(String email, String name, String role, String password, String stdNum, String depart) {
+
+        UserRole userRole = UserRole.valueOf(role.toUpperCase());
+
+        User newUser = User.builder()
+                .email(email)
+                .name(name)
+                .password(password)           // 비밀번호 암호화가 필요한 경우, 별도 처리
+                .role(userRole)
+                .studentNumber(stdNum)
+                .department(depart)
+                .build();
+
+        // 3. 저장
+        User savedUser = userRepository.save(newUser);
+
+        // 4. DTO 변환 및 반환
+        return UserDto.builder()
+                .id(savedUser.getId())
+                .email(savedUser.getEmail())
+                .name(savedUser.getName())
+                .role(savedUser.getRole())
+                .studentNumber(savedUser.getStudentNumber())
+                .department(savedUser.getDepartment())
+                .createdAt(savedUser.getCreatedAt())
+                .lastUpdatedAt(savedUser.getLastUpdatedAt())
                 .build();
     }
 }

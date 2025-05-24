@@ -28,6 +28,15 @@ public class User {
     @Column(nullable = false)
     private UserRole role;
 
+    @Column(name = "student_number")
+    private String studentNumber;
+
+    @Column(name = "department")
+    private String department;
+
+    @Column(name = "password")
+    private String password;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
