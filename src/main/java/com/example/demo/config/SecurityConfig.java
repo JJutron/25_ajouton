@@ -27,7 +27,8 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/store/**",
                                 "/users/**",
-                                "/orders/**"
+                                "/orders/**",
+                                "/cart/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // preflight 허용
                         .anyRequest().authenticated()

@@ -73,10 +73,6 @@ public class OrderService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
 
-        if (user.getRole() != UserRole.BUSINESS) {
-            throw new SecurityException("해당 작업은 BUSINESS 권한 사용자만 수행할 수 있습니다.");
-        }
-
         // 2. 주문 존재 여부 확인 및 상태 변경
         UserOrder order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다."));
