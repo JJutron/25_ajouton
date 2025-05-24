@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.domain.User;
 import com.example.demo.domain.UserOrder;
 import com.example.demo.dto.OrderDto;
+import com.example.demo.dto.OrderResponseDto;
 import com.example.demo.enums.OrderStatus;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.UserRepository;
@@ -48,6 +49,12 @@ public class OrderController {
     @GetMapping("/all")
     public ResponseEntity<List<OrderDto>> getPendingOrders(@RequestParam Long userId) {
         List<OrderDto> orders = orderService.getPendingOrdersByUser(userId);
+        return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/all_detail")
+    public ResponseEntity<List<OrderResponseDto>> getUserOrdersWithDetails(@RequestParam Long userId) {
+        List<OrderResponseDto> orders = orderService.getUserOrdersWithDetails(userId);
         return ResponseEntity.ok(orders);
     }
 }

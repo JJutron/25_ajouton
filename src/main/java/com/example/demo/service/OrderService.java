@@ -5,6 +5,7 @@ import com.example.demo.domain.Store;
 import com.example.demo.domain.User;
 import com.example.demo.domain.UserOrder;
 import com.example.demo.dto.OrderDto;
+import com.example.demo.dto.OrderResponseDto;
 import com.example.demo.enums.OrderStatus;
 import com.example.demo.enums.UserRole;
 import com.example.demo.repository.MenuRepository;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -110,5 +112,25 @@ public class OrderService {
                         .lastUpdatedAt(order.getLastUpdatedAt())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public List<OrderResponseDto> getUserOrdersWithDetails(Long userId) {
+        List<UserOrder> orders = orderRepository.findByUserId(userId);
+
+        return orders.stream().map(order -> {
+            String storeName = order.getStore().getStoreName();
+            Optional<Menu> firstMenu = menuRepository.findFirstByStoreId(order.getStore().getId());
+
+            String menuName = firstMenu.map(Menu::getMenuName).orElse("메뉴 정보 없음");
+            return OrderResponseDto.builder()
+                    .id(order.getId())
+                    .userId(order.getUser().getId())
+                    .storeName(storeName)
+                    .menuName(menuName)
+                    .price(order.getPrice())
+                    .status(order.getStatus().name()) // Enum -> String
+                    .createdAt(order.getCreatedAt())
+                    .build();
+        }).collect(Collectors.toList());
     }
 }
