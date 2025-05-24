@@ -11,6 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +33,43 @@ public class loginService {
                 .createdAt(user.getCreatedAt())
                 .lastUpdatedAt(user.getLastUpdatedAt())
                 .build();
+    }
+
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(user -> UserDto.builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .name(user.getName())
+                        .role(user.getRole())
+                        .studentNumber(user.getStudentNumber())
+                        .department(user.getDepartment())
+                        .createdAt(user.getCreatedAt())
+                        .lastUpdatedAt(user.getLastUpdatedAt())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    public UserDto getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        return UserDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .role(user.getRole())
+                .studentNumber(user.getStudentNumber())
+                .department(user.getDepartment())
+                .createdAt(user.getCreatedAt())
+                .lastUpdatedAt(user.getLastUpdatedAt())
+                .build();
+    }
+
+    public void deleteUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        userRepository.delete(user);
     }
 
     @Transactional

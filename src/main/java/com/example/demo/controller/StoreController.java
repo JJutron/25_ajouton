@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/store")
@@ -18,5 +20,11 @@ public class StoreController {
                                               @RequestParam String storeLocation) {
         StoreDto result = storeService.save(storeName, storeLocation);
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<StoreDto>> getAllStores() {
+        List<StoreDto> stores = storeService.findAll();
+        return ResponseEntity.ok(stores);
     }
 }

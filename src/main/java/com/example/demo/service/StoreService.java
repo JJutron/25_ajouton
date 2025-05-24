@@ -6,6 +6,9 @@ import com.example.demo.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class StoreService {
@@ -25,5 +28,15 @@ public class StoreService {
                 .storeName(store.getStoreName())
                 .storeLocation(store.getStoreLocation())
                 .build();
+    }
+
+    public List<StoreDto> findAll() {
+        return storeRepository.findAll().stream()
+                .map(store -> StoreDto.builder()
+                        .id(store.getId())
+                        .storeName(store.getStoreName())
+                        .storeLocation(store.getStoreLocation())
+                        .build())
+                .collect(Collectors.toList());
     }
 }
