@@ -118,11 +118,16 @@ public class OrderService {
     public List<OrderResponseDto> getUserOrdersWithDetails(Long userId) {
         List<UserOrder> orders = orderRepository.findByUserId(userId);
 
+
         return orders.stream().map(order -> {
             String storeName = order.getStore().getStoreName();
-            Optional<Menu> firstMenu = menuRepository.findFirstByStoreId(order.getStore().getId());
 
-            String menuName = firstMenu.map(Menu::getMenuName).orElse("메뉴 정보 없음");
+            // storeId + price로 정확히 일치하는 메뉴 찾기
+            String menuName = menuRepository
+                    .findFirstByStoreIdAndPrice(order.getStore().getId(), order.getPrice())
+                    .map(Menu::getMenuName)
+                    .orElse("메뉴 정보 없음");
+
             return OrderResponseDto.builder()
                     .id(order.getId())
                     .userId(order.getUser().getId())
