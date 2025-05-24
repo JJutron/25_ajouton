@@ -1,7 +1,10 @@
 package com.example.demo.service;
 
+import com.example.demo.domain.Menu;
 import com.example.demo.domain.Store;
+import com.example.demo.dto.MenuDto;
 import com.example.demo.dto.StoreDto;
+import com.example.demo.repository.MenuRepository;
 import com.example.demo.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +17,7 @@ import java.util.stream.Collectors;
 public class StoreService {
 
     private final StoreRepository storeRepository;
+    private final MenuRepository menuRepository;
 
     public StoreDto save(String storeName, String storeLocation) {
         Store store = Store.builder()
@@ -38,5 +42,38 @@ public class StoreService {
                         .storeLocation(store.getStoreLocation())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public MenuDto addMenu(Long storeId, String menuName, Integer price, Integer amount, String description) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 store가 존재하지 않습니다."));
+
+        Menu menu = Menu.builder()
+                .store(store)
+                .menuName(menuName)
+                .price(price)
+                .amount(amount)
+                .description(description)
+                .build();
+
+        Menu saved = menuRepository.save(menu);
+
+        return MenuDto.builder()
+                .id(saved.getId())
+                .storeId(store.getId())
+                .menuName(saved.getMenuName())
+                .price(saved.getPrice())
+                .amount(saved.getAmount())
+                .description(saved.getDescription())
+                .createdAt(saved.getCreatedAt())
+                .lastUpdatedAt(saved.getLastUpdatedAt())
+                .build();
+    }
+
+    public void deleteMenu(Long storeId, String menuName) {
+        Menu menu = menuRepository.findByStoreIdAndMenuName(storeId, menuName)
+                .orElseThrow(() -> new IllegalArgumentException("해당 메뉴가 존재하지 않습니다."));
+
+        menuRepository.delete(menu);
     }
 }

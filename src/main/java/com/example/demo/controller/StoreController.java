@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.MenuDto;
 import com.example.demo.dto.StoreDto;
 import com.example.demo.service.StoreService;
 import lombok.RequiredArgsConstructor;
@@ -27,4 +28,23 @@ public class StoreController {
         List<StoreDto> stores = storeService.findAll();
         return ResponseEntity.ok(stores);
     }
+
+
+    @PostMapping("/{storeId}/menu")
+    public ResponseEntity<MenuDto> addMenu(@PathVariable Long storeId,
+                                           @RequestParam String menuName,
+                                           @RequestParam int price,
+                                           @RequestParam(required = false, defaultValue = "0") int amount,
+                                           @RequestParam String description) {
+        MenuDto menu = storeService.addMenu(storeId, menuName, price, amount, description);
+        return ResponseEntity.ok(menu);
+    }
+
+    @DeleteMapping("/{storeId}/menu")
+    public ResponseEntity<Void> deleteMenu(@PathVariable Long storeId,
+                                           @RequestParam String menuName) {
+        storeService.deleteMenu(storeId, menuName);
+        return ResponseEntity.noContent().build();
+    }
+
 }
