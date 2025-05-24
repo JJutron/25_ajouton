@@ -16,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -91,5 +93,26 @@ public class OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다."));
 
         return order.getStatus() == OrderStatus.COMPLETED;
+    }
+
+    @Transactional
+    public List<OrderDto> getPendingOrdersByUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        List<UserOrder> pendingOrders = orderRepository.findByUserAndStatus(user, OrderStatus.PENDING);
+
+
+        return pendingOrders.stream()
+                .map(order -> OrderDto.builder()
+                        .id(order.getId())
+                        .userId(order.getUser().getId())
+                        .storeId(order.getStore().getId())
+                        .price(order.getPrice())
+                        .status(order.getStatus())
+                        .createdAt(order.getCreatedAt())
+                        .lastUpdatedAt(order.getLastUpdatedAt())
+                        .build())
+                .collect(Collectors.toList());
     }
 }
