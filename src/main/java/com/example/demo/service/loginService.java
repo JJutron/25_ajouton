@@ -1,37 +1,30 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.UserDto;
+import com.example.demo.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
 public class loginService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public UserDto signup(UserSignupRequest request) {
-        // 이메일 중복 확인
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
-        }
+    // 로그인 - 이메일로 사용자 조회 후 DTO 반환
+    public UserDto login(String email) {
+        com.example.entity.User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        // 엔티티 생성
-        User user = User.builder()
-                .email(request.getEmail())
-                .name(request.getName())
-                .role(request.getRole() != null ? request.getRole() : UserRole.USER)
-                .password(passwordEncoder.encode(request.getPassword()))
-                .createdAt(LocalDateTime.now())
-                .lastUpdatedAt(LocalDateTime.now())
-                .build();
-
-        // 저장
-        User saved = userRepository.save(user);
-
-        // DTO 반환
         return UserDto.builder()
-                .id(saved.getId())
-                .email(saved.getEmail())
-                .name(saved.getName())
-                .role(saved.getRole())
-                .createdAt(saved.getCreatedAt())
-                .lastUpdatedAt(saved.getLastUpdatedAt())
+                .id(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .role(user.getRole())
+                .createdAt(user.getCreatedAt())
+                .lastUpdatedAt(user.getLastUpdatedAt())
                 .build();
     }
 }
