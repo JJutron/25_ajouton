@@ -1,37 +1,135 @@
 package com.example.demo.service;
 
+
+import com.example.demo.domain.User;
+import com.example.demo.dto.UserDto;
+import com.example.demo.enums.UserRole;
+import com.example.demo.repository.UserRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
 public class loginService {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
 
-    public UserDto signup(UserSignupRequest request) {
-        // 이메일 중복 확인
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
-        }
+    // 로그인 - 이메일로 사용자 조회 후 DTO 반환
+    public UserDto login(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        // 엔티티 생성
-        User user = User.builder()
-                .email(request.getEmail())
-                .name(request.getName())
-                .role(request.getRole() != null ? request.getRole() : UserRole.USER)
-                .password(passwordEncoder.encode(request.getPassword()))
-                .createdAt(LocalDateTime.now())
-                .lastUpdatedAt(LocalDateTime.now())
+        return UserDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .role(user.getRole())
+                .createdAt(user.getCreatedAt())
+                .lastUpdatedAt(user.getLastUpdatedAt())
+                .build();
+    }
+
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(user -> UserDto.builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .name(user.getName())
+                        .role(user.getRole())
+                        .studentNumber(user.getStudentNumber())
+                        .department(user.getDepartment())
+                        .createdAt(user.getCreatedAt())
+                        .lastUpdatedAt(user.getLastUpdatedAt())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    public UserDto getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        return UserDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .role(user.getRole())
+                .studentNumber(user.getStudentNumber())
+                .department(user.getDepartment())
+                .createdAt(user.getCreatedAt())
+                .lastUpdatedAt(user.getLastUpdatedAt())
+                .build();
+    }
+
+    public void deleteUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        userRepository.delete(user);
+    }
+
+    @Transactional
+    public UserDto signup(String email, String name, String role, String password, String stdNum, String depart) {
+
+        UserRole userRole = UserRole.valueOf(role.toUpperCase());
+
+        User newUser = User.builder()
+                .email(email)
+                .name(name)
+                .password(password)           // 비밀번호 암호화가 필요한 경우, 별도 처리
+                .role(userRole)
+                .studentNumber(stdNum)
+                .department(depart)
                 .build();
 
-        // 저장
-        User saved = userRepository.save(user);
+        // 3. 저장
+        User savedUser = userRepository.save(newUser);
 
-        // DTO 반환
+        // 4. DTO 변환 및 반환
         return UserDto.builder()
-                .id(saved.getId())
-                .email(saved.getEmail())
-                .name(saved.getName())
-                .role(saved.getRole())
-                .createdAt(saved.getCreatedAt())
-                .lastUpdatedAt(saved.getLastUpdatedAt())
+                .id(savedUser.getId())
+                .email(savedUser.getEmail())
+                .name(savedUser.getName())
+                .role(savedUser.getRole())
+                .studentNumber(savedUser.getStudentNumber())
+                .department(savedUser.getDepartment())
+                .createdAt(savedUser.getCreatedAt())
+                .lastUpdatedAt(savedUser.getLastUpdatedAt())
+                .build();
+    }
+
+    public boolean login(String email, String rawPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        log.debug("입력된 비밀번호: {}", rawPassword);
+        log.debug("저장된 비밀번호: {}", user.getPassword());
+
+        boolean matches = rawPassword.equals(user.getPassword());
+        log.debug("비밀번호 T/F : {}", matches);
+
+        return matches;
+    }
+
+    public UserDto getUserDtoByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        return UserDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .role(user.getRole())
+                .studentNumber(user.getStudentNumber())
+                .department(user.getDepartment())
+                .createdAt(user.getCreatedAt())
+                .lastUpdatedAt(user.getLastUpdatedAt())
                 .build();
     }
 }
+

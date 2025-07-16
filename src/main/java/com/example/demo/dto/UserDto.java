@@ -15,6 +15,8 @@ public class UserDto {
     private String email;
     private String name;
     private UserRole role;
+    private String studentNumber;     // 학번
+    private String department;        // 학과
     private LocalDateTime createdAt;
     private LocalDateTime lastUpdatedAt;
 
